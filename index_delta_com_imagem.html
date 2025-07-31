@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Cavacos</title>
+  <style>
+    body { background: #e7f1f9; font-family: Arial, sans-serif; color: #333; padding: 20px; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .row { display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .col { width: 48%; }
+    label { display: block; margin-bottom: 6px; color: #0055a4; font-weight: bold; }
+    input { width: 100%; padding: 8px; font-size: 16px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; }
+    .result { font-size: 24px; font-weight: bold; color: #0055a4; text-align: center; margin: 20px 0; }
+    .table-responsive { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #f0f8ff; color: #0055a4; }
+    .toggle-btn { display: block; margin: 0 auto 20px; padding: 10px 20px; background: #0055a4; color: white; border: none; border-radius: 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Calculadora de Cavacos</h1>
+    <button id="toggleCalc" class="toggle-btn">Calcular por Avanço</button>
+    <div class="row">
+      <div class="col" id="colFeed">
+        <label>Feed Rate (mm/m)</label>
+        <input type="number" id="inputFeed" placeholder="2500" />
+        <label>Fresa Nº de arestas</label>
+        <input type="number" id="inputArestasFeed" placeholder="2" />
+        <label>Tamanho do cavaco</label>
+        <input type="number" step="0.01" id="inputCavacoFeed" placeholder="0.33" />
+        <div class="result" id="resultRPM">RPM: –</div>
+      </div>
+      <div class="col" id="colRPM" style="display:none">
+        <label>RPM Spindle</label>
+        <input type="number" id="inputRPM" placeholder="18000" />
+        <label>Fresa Nº de arestas</label>
+        <input type="number" id="inputArestasRPM" placeholder="2" />
+        <label>Tamanho do cavaco</label>
+        <input type="number" step="0.01" id="inputCavacoRPM" placeholder="0.33" />
+        <div class="result" id="resultFeed">Feed Rate: –</div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+      <h2>Referência Visual para Preenchimento</h2>
+      <img src="tabela_cavacos_escaneada.png" alt="Tabela Cavacos Escaneada" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px; background: white;" />
+    </div>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr><th>Diâmetro da Fresa</th><th>Madeira Dura</th><th>Madeira Macia</th><th>MDF</th><th>Plástico Macio</th><th>Plástico Rígido</th><th>Alumínio</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>3 mm</td><td>0.08‑0.13</td><td>0.10‑0.15</td><td>0.10‑0.18</td><td>0.10‑0.15</td><td>0.15‑0.20</td><td>0.05‑0.10</td></tr>
+          <tr><td>6 mm</td><td>0.23‑0.28</td><td>0.28‑0.33</td><td>0.33‑0.41</td><td>0.20‑0.30</td><td>0.25‑0.30</td><td>0.08‑0.15</td></tr>
+          <tr><td>10 mm</td><td>0.38‑0.46</td><td>0.43‑0.51</td><td>0.51‑0.58</td><td>0.20‑0.30</td><td>0.25‑0.30</td><td>0.10‑0.20</td></tr>
+          <tr><td>≥12 mm</td><td>0.48‑0.53</td><td>0.53‑0.58</td><td>0.64‑0.69</td><td>0.25‑0.36</td><td>0.30‑0.41</td><td>0.20‑0.25</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('toggleCalc');
+    const colFeed = document.getElementById('colFeed');
+    const colRPM = document.getElementById('colRPM');
+    const resRPM = document.getElementById('resultRPM');
+    const resFeed = document.getElementById('resultFeed');
+    const inFeed = document.getElementById('inputFeed');
+    const inAresF = document.getElementById('inputArestasFeed');
+    const inCavF = document.getElementById('inputCavacoFeed');
+    const inRPM = document.getElementById('inputRPM');
+    const inAresR = document.getElementById('inputArestasRPM');
+    const inCavR = document.getElementById('inputCavacoRPM');
+
+    function updateRPM() {
+      const f = parseFloat(inFeed.value);
+      const z = parseFloat(inAresF.value);
+      const tc = parseFloat(inCavF.value);
+      if(f > 0 && z > 0 && tc > 0) {
+        const rpm = f / (z * tc);
+        resRPM.textContent = 'RPM: ' + rpm.toFixed(2);
+      } else {
+        resRPM.textContent = 'RPM: –';
+      }
+    }
+    function updateFeed() {
+      const rpm = parseFloat(inRPM.value);
+      const z = parseFloat(inAresR.value);
+      const tc = parseFloat(inCavR.value);
+      if(rpm > 0 && z > 0 && tc > 0) {
+        const f = rpm * z * tc;
+        resFeed.textContent = 'Feed Rate: ' + f.toFixed(2);
+      } else {
+        resFeed.textContent = 'Feed Rate: –';
+      }
+    }
+
+    inFeed.addEventListener('input', updateRPM);
+    inAresF.addEventListener('input', updateRPM);
+    inCavF.addEventListener('input', updateRPM);
+    inRPM.addEventListener('input', updateFeed);
+    inAresR.addEventListener('input', updateFeed);
+    inCavR.addEventListener('input', updateFeed);
+
+    toggle.addEventListener('click', () => {
+      const isFeed = colFeed.style.display !== 'none';
+      if(isFeed) {
+        colFeed.style.display = 'none';
+        colRPM.style.display = 'block';
+        toggle.textContent = 'Calcular por RPM';
+      } else {
+        colFeed.style.display = 'block';
+        colRPM.style.display = 'none';
+        toggle.textContent = 'Calcular por Avanço';
+      }
+    });
+  </script>
+</body>
+</html>
